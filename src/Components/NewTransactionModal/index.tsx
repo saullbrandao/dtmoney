@@ -1,9 +1,9 @@
 import { FormEvent, useState } from 'react'
 import Modal from 'react-modal'
+import { useTransactions } from '../../hooks/useTransactions'
 import closeImg from '../../assets/close.svg'
 import incomeImg from '../../assets/income.svg'
 import outcomeImg from '../../assets/outcome.svg'
-import { api } from '../../services/api'
 import * as S from './styles'
 
 type NewTransactionModalProps = {
@@ -15,22 +15,27 @@ export const NewTransactionModal = ({
   isOpen,
   onRequestClose,
 }: NewTransactionModalProps) => {
+  const { createTransaction } = useTransactions()
   const [title, setTitle] = useState('')
   const [category, setCategory] = useState('')
-  const [value, setValue] = useState(0)
+  const [amount, setAmount] = useState(0)
   const [type, setType] = useState('deposit')
 
-  const handleCreateNewTransaction = (e: FormEvent) => {
+  const handleCreateNewTransaction = async (e: FormEvent) => {
     e.preventDefault()
 
-    const data = {
+    await createTransaction({
       title,
-      value,
+      amount,
       category,
       type,
-    }
+    })
 
-    api.post('/transactions', data)
+    setTitle('')
+    setAmount(0)
+    setCategory('')
+    setType('deposit')
+    onRequestClose()
   }
 
   return (
@@ -57,8 +62,8 @@ export const NewTransactionModal = ({
         <input
           placeholder="Value"
           type="number"
-          value={value}
-          onChange={e => setValue(e.currentTarget.valueAsNumber)}
+          value={amount}
+          onChange={e => setAmount(e.currentTarget.valueAsNumber)}
         />
 
         <S.Wrapper>
