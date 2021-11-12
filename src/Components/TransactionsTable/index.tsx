@@ -1,6 +1,23 @@
+import { useEffect, useState } from 'react'
+import { api } from '../../services/api'
 import * as S from './styles'
 
+type TransactionType = {
+  id: number
+  title: string
+  amount: number
+  type: 'deposit' | 'withdraw'
+  category: string
+  createdAt: string
+}
+
 export const TransactionsTable = () => {
+  const [transactions, setTransactions] = useState<TransactionType[]>()
+
+  useEffect(() => {
+    api.get('/transactions').then(res => setTransactions(res.data.transactions))
+  }, [])
+
   return (
     <S.Container>
       <S.Table>
@@ -14,18 +31,23 @@ export const TransactionsTable = () => {
         </thead>
 
         <tbody>
-          <tr>
-            <td>Salary</td>
-            <td className="deposit">R$ 3000,00</td>
-            <td>Salary</td>
-            <td>10/10/2020</td>
-          </tr>
-          <tr>
-            <td>Rent</td>
-            <td className="withdraw">-R$ 1000,00</td>
-            <td>House</td>
-            <td>10/10/2020</td>
-          </tr>
+          {transactions?.map(
+            ({ title, id, amount, category, type, createdAt }) => (
+              <tr key={id}>
+                <td>{title}</td>
+                <td className={type}>
+                  {new Intl.NumberFormat('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL',
+                  }).format(amount)}
+                </td>
+                <td>{category}</td>
+                <td>
+                  {new Intl.DateTimeFormat('pt-BR').format(new Date(createdAt))}
+                </td>
+              </tr>
+            ),
+          )}
         </tbody>
       </S.Table>
     </S.Container>
