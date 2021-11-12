@@ -1,5 +1,5 @@
-import { Dashboard } from './Components/Dashboard'
 import { Header } from './Components/Header'
+import { Dashboard } from './Components/Dashboard'
 
 export const App = () => {
   return (
